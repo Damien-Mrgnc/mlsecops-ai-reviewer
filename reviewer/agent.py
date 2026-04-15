@@ -13,6 +13,11 @@ import textwrap
 import requests
 from dotenv import load_dotenv
 
+GEMINI_REST_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/models/"
+    "gemini-2.0-flash:generateContent"
+)
+
 load_dotenv()
 
 from github_client import get_pr_diff, post_review_with_decision
@@ -83,15 +88,18 @@ def build_prompt(rules: str, diff: str) -> str:
 
 
 def call_gemini(prompt: str) -> str:
-    """Appelle Gemini 1.5 Flash directement."""
-    import google.generativeai as genai
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel(
-        "gemini-1.5-flash",
-        generation_config={"response_mime_type": "application/json"},
+    """Appelle Gemini 2.0 Flash via REST API."""
+    response = requests.post(
+        GEMINI_REST_URL,
+        params={"key": GEMINI_API_KEY},
+        json={
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"responseMimeType": "application/json"},
+        },
+        timeout=60,
     )
-    response = model.generate_content(prompt)
-    return response.text
+    response.raise_for_status()
+    return response.json()["candidates"][0]["content"]["parts"][0]["text"]
 
 
 def call_mlsecops_api(prompt: str) -> str:
