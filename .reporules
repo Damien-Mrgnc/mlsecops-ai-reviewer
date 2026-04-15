@@ -1,0 +1,20 @@
+# Règles de Code Review — MLSecOps Agent
+
+## Sécurité (CRITIQUE — REQUEST_CHANGES obligatoire)
+- INTERDICTION de hardcoder des secrets, clés API, mots de passe ou tokens dans le code source.
+- INTERDICTION de désactiver la validation SSL/TLS (verify=False, InsecureRequestWarning).
+- INTERDICTION d'utiliser eval() ou exec() avec des inputs utilisateur non validés.
+- INTERDICTION de logger des données sensibles (mots de passe, tokens, PII).
+- Les requêtes SQL DOIVENT utiliser des paramètres préparés (pas de concaténation de chaînes).
+- Toutes les entrées utilisateur DOIVENT être validées avant utilisation.
+
+## Qualité de code (AVERTISSEMENT)
+- Les noms de variables DOIVENT être descriptifs (min. 3 caractères, pas de i, j, x, y sauf boucles).
+- Chaque fonction DOIT avoir une responsabilité unique (Single Responsibility Principle).
+- Les exceptions DOIVENT être catchées spécifiquement (pas de `except Exception` générique).
+- INTERDICTION de code mort ou de blocs commentés sans explication.
+
+## Infrastructure as Code (Terraform) — CRITIQUE
+- INTERDICTION d'ouvrir les Security Groups sur 0.0.0.0/0 sauf pour les ALB publics (ports 80/443).
+- Les buckets S3 DOIVENT avoir le chiffrement activé.
+- Les ressources AWS DOIVENT avoir les tags Name et Environment.
