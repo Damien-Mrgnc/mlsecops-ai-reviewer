@@ -94,7 +94,6 @@ def call_gemini(prompt: str) -> str:
 
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json"},
     }
     for attempt in range(4):
         response = requests.post(
