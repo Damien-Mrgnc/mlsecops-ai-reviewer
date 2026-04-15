@@ -88,18 +88,28 @@ def build_prompt(rules: str, diff: str) -> str:
 
 
 def call_gemini(prompt: str) -> str:
-    """Appelle Gemini 2.0 Flash via REST API."""
-    response = requests.post(
-        GEMINI_REST_URL,
-        params={"key": GEMINI_API_KEY},
-        json={
-            "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"responseMimeType": "application/json"},
-        },
-        timeout=60,
-    )
-    response.raise_for_status()
-    return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+    """Appelle Gemini 2.0 Flash via REST API avec retry sur 429."""
+    import time
+
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"responseMimeType": "application/json"},
+    }
+    for attempt in range(4):
+        response = requests.post(
+            GEMINI_REST_URL,
+            params={"key": GEMINI_API_KEY},
+            json=payload,
+            timeout=60,
+        )
+        if response.status_code == 429:
+            wait = 15 * (attempt + 1)
+            print(f"[AGENT] Rate limit 429, attente {wait}s (tentative {attempt + 1}/4)...")
+            time.sleep(wait)
+            continue
+        response.raise_for_status()
+        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+    response.raise_for_status()  # lève l'erreur après 4 tentatives
 
 
 def call_mlsecops_api(prompt: str) -> str:
