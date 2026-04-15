@@ -13,7 +13,7 @@ import textwrap
 import requests
 from dotenv import load_dotenv
 
-GEMINI_MODEL    = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-lite")
+GEMINI_MODEL    = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 GEMINI_REST_URL = (
     f"https://generativelanguage.googleapis.com/v1beta/models/"
     f"{GEMINI_MODEL}:generateContent"
