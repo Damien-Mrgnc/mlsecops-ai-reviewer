@@ -13,9 +13,10 @@ import textwrap
 import requests
 from dotenv import load_dotenv
 
+GEMINI_MODEL    = os.getenv("GEMINI_MODEL", "gemini-2.0-flash-lite")
 GEMINI_REST_URL = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-2.0-flash:generateContent"
+    f"https://generativelanguage.googleapis.com/v1beta/models/"
+    f"{GEMINI_MODEL}:generateContent"
 )
 
 load_dotenv()
@@ -190,7 +191,7 @@ def main():
         start = raw.find("{")
         end = raw.rfind("}") + 1
         review_data = json.loads(raw[start:end])
-    except (json.JSONDecodeError, ValueError) as e:
+    except ValueError as e:
         print(f"[AGENT ERROR] JSON invalide : {e}\nRaw: {raw}")
         sys.exit(1)
 
